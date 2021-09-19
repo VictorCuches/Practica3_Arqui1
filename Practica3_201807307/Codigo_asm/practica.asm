@@ -19,7 +19,7 @@ sdatos segment
 	msgu1 db "Ingrese nombre de jugador 1: ", "$"
 	msgu2 db "Ingrese nombre de jugador 2: ", "$"
 	namesJ db "--- Jugadores ---", 0DH, 0AH, "$"
-	errorJ db "Error. Se debe crear jugadores primero "
+	errorJ db "Error. Se debe crear jugadores primero ", "$"
 
 	shownameJ1 db "Jugador 1: ", "$"
 	shownameJ2 db "Jugador 2: ", "$"
@@ -27,6 +27,27 @@ sdatos segment
 	nameJ1 db 50 dup("$")
 	nameJ2 db 50 dup("$")
 	bool_name db 0
+
+	tituloTab db "----- TABLERO DE JUEGO -----","$"
+	cabecerasC db "ABCDEFGH$"
+	cabecerasF db "12345678$"
+	lineas db "|-$"
+	individual db " $"
+	espacio db " $"
+
+	iteradorI dw 0
+	iteradorJ dw 0
+	iteradorK dw 0
+
+	tablero db 1,0,1,0,1,0,1,0
+			db 0,1,0,1,0,1,0,1
+			db 1,0,1,0,1,0,1,0
+			db 0,0,0,0,0,0,0,0
+			db 0,0,0,0,0,0,0,0
+			db 0,2,0,2,0,2,0,2
+			db 2,0,2,0,2,0,2,0
+			db 0,2,0,2,0,2,0,2 ,"$"
+
 
 sdatos ends
 
@@ -93,6 +114,9 @@ scodigo segment 'CODE'
 				imprimir shownameJ2
 				imprimir nameJ2
 				imprimir salto
+				imprimir tituloTab
+				imprimir salto
+				showTablero
 
 			jmp show_menu
 		opcion2:
