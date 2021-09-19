@@ -12,28 +12,41 @@ sdatos segment
 	msg3 db "2. Crear jugadores",0DH, 0AH, "$"
 	msg4 db "3. Salir", 0DH, 0AH, "$"
 
-	msgo1 db "JUGANDO",0DH, 0AH,"$"
+	
 	msgo2 db "CREANDO JUGADORES",0DH, 0AH, "$"
 	msgo3 db "ADIOS... ",0DH, 0AH,"$"
 
 	msgu1 db "Ingrese nombre de jugador 1: ", "$"
 	msgu2 db "Ingrese nombre de jugador 2: ", "$"
-	namesJ db "--- Jugadores ---", 0DH, 0AH, "$"
+	namesJ db "----- Jugadores -----", 0DH, 0AH, "$"
 	errorJ db "Error. Se debe crear jugadores primero ", "$"
+	pauseEnter db 50 dup("$"), "$"
 
 	shownameJ1 db "Jugador 1: ", "$"
 	shownameJ2 db "Jugador 2: ", "$"
+	fichaInfo1 db "Ficha verde ","$"
+	fichaInfo2 db "Ficha roja ","$"
+	puntos db " puntos","$"
+
+	turnomsg db "Turno de: ","$"
+	entradamovi db "Ingrese movimiento de fichas: ","$"
+
+	puntosJ1 db "1$" ; deben ser tipo number
+	puntosJ2 db "2$"
 
 	nameJ1 db 50 dup("$")
 	nameJ2 db 50 dup("$")
 	bool_name db 0
 
 	tituloTab db "----- TABLERO DE JUEGO -----","$"
+	
 	cabecerasC db "ABCDEFGH$"
 	cabecerasF db "12345678$"
 	lineas db "|-$"
 	individual db " $"
 	espacio db " $"
+	linver db "|$"
+	color db 0
 
 	iteradorI dw 0
 	iteradorJ dw 0
@@ -102,23 +115,53 @@ scodigo segment 'CODE'
 			jmp opcion2
 
 			playgame:
-				imprimir salto
-				imprimir msgo1
-				imprimir salto
-				;guardado de nombres
+			
+				;mostrando info jugadores
 			
 				imprimir namesJ
 				imprimir shownameJ1
 				imprimir nameJ1
 				imprimir salto
+				imprimir fichaInfo1
+				imprimir espacio 
+				imprimir puntosJ1 ;PENDIENTE
+				imprimir puntos
+
+				imprimir salto
 				imprimir shownameJ2
 				imprimir nameJ2
 				imprimir salto
-				imprimir tituloTab
+				imprimir fichaInfo2
+				imprimir espacio 
+				imprimir puntosJ2 ;PENDIENTE 
+				imprimir puntos
+
+				
+
+			
+			
+				
+				imprimir salto
 				imprimir salto
 				showTablero
+				readjugador pauseEnter
+				limpiarT
+				
 
-			jmp show_menu
+				
+			
+			;jmp show_menu
+			
+		
+		juegoDamas:
+			imprimir turnomsg 
+			imprimir nameJ1
+			imprimir salto 
+			imprimir entradamovi
+			imprimir salto
+
+			jmp opcion3
+
 		opcion2:
 			imprimir salto
 			imprimir msgo2
@@ -144,7 +187,7 @@ scodigo segment 'CODE'
 			
 
 		
-		
+			limpiarT
 
 			jmp opcion1
 		opcion3:

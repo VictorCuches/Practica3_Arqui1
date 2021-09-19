@@ -46,7 +46,8 @@ endm
 
 showTablero macro
     local ciclo, ciclo2, ciclo3, ciclo4, reinicio, reinicio2
-
+    
+    imprimir espacio
     imprimir espacio
     imprimir espacio
     xor si, si ; limpiando si
@@ -70,14 +71,18 @@ showTablero macro
         mov individual[0], bl
         imprimir individual
         imprimir espacio
+     
+        imprimir linver
 
         mov iteradorI, 0d
 
         ciclo3: 
             mov di, iteradorJ
             verificarValor tablero[di]
+           
             inc iteradorJ
-            imprimir individual
+            ;imprimir individual
+            imprimirficha individual
 
             inc iteradorI
             cmp iteradorI, 8d
@@ -92,6 +97,8 @@ showTablero macro
 
         reinicio: 
             ; linea divisoria entre filas
+            imprimir espacio
+            imprimir linver
             cmp si, 7d
             jz reinicio2
             mov iteradorI, 0d
@@ -104,7 +111,7 @@ showTablero macro
                 mov individual[0], bl
                 imprimir individual
                 inc iteradorI
-                cmp iteradorI, 30d
+                cmp iteradorI, 32d
                 jnz ciclo4
             
         reinicio2:
@@ -130,17 +137,33 @@ verificarValor macro valor
     jz uno
 
     dos: 
-        mov individual[0], "B"
+        mov color, 04d
+        mov individual[0], 02
         jmp fin
 
     uno: 
-        mov individual[0], "N"
+        mov color, 11d
+        mov individual[0], 01
         jmp fin
 
     cero: 
+        mov color, 0d
         mov individual[0], " "
         jmp fin
 
     fin:
+
+endm
+
+imprimirficha macro cadena
+    ;mov ax, @data 
+    ;mov ds, ax
+
+    mov ah, 09h
+    mov bl, color
+    mov cx, lengthof cadena - 1
+    int 10h ;color
+    lea dx, cadena
+    int 21h ;print
 
 endm
