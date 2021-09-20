@@ -167,3 +167,86 @@ imprimirficha macro cadena
     int 21h ;print
 
 endm
+
+posFicha macro row, column
+    mov ax, row
+    mov bx, 8d
+    mul bx
+    add ax, column
+    mov indice, ax
+    ;usando posicion[i][j] = i * numero de columnas + j (row-major)
+    ;para saber la posicion de cada ficha
+endm
+
+filaTablero macro numFpos
+    local inicio, ciclo, saveFpos
+
+    inicio:
+        xor di, di ; limpio di
+        mov bl, readTeclado[numFpos]
+
+    ciclo:
+        cmp cabecerasF[di], bl
+        jz saveFpos ;eliminar la ficha
+        inc di
+        cmp di, 8d
+        jnz ciclo
+    
+    imprimir salto
+    imprimir moverror
+    imprimir salto
+    jmp inicio
+
+    saveFpos:
+        mov fila, di ;numero de fila 
+endm
+
+columnaTablero macro  numCpos
+    local inicio, ciclo, saveCpos
+
+    inicio:
+        xor di, di
+        mov bl, readTeclado[numCpos]
+    
+    ciclo:
+        cmp cabecerasC[di], bl
+        jz saveCpos
+        inc di
+        cmp di, 8d
+        jnz ciclo
+    
+    imprimir salto
+    imprimir moverror
+    imprimir salto
+    jmp inicio
+
+    saveCpos:
+        mov columna, di
+
+endm
+
+MOSTRAR_TAB macro
+	imprimir namesJ
+	imprimir shownameJ1
+	imprimir nameJ1
+	imprimir salto
+	imprimir fichaInfo1
+	imprimir espacio 
+	imprimir puntosJ1 ;PENDIENTE
+	imprimir puntos
+
+	imprimir salto
+	imprimir shownameJ2
+	imprimir nameJ2
+	imprimir salto
+	imprimir fichaInfo2
+	imprimir espacio 
+	imprimir puntosJ2 ;PENDIENTE 
+	imprimir puntos
+
+	imprimir salto
+	imprimir salto
+	showTablero
+
+	 
+endm

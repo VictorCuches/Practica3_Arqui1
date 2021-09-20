@@ -39,7 +39,8 @@ sdatos segment
 	bool_name db 0
 
 	tituloTab db "----- TABLERO DE JUEGO -----","$"
-	
+	moverror db "Movimiento incorrecto ",0DH, 0AH,"$"
+	noficha db "Error. No se encuentra ficha a mover","$"
 	cabecerasC db "ABCDEFGH$"
 	cabecerasF db "12345678$"
 	lineas db "|-$"
@@ -52,6 +53,15 @@ sdatos segment
 	iteradorJ dw 0
 	iteradorK dw 0
 
+	oldF db 0d
+	oldC db 1d
+	newF db 3d
+	newC db 4d
+
+	indice dw 0
+	fila dw 0
+	columna dw 0
+
 	tablero db 1,0,1,0,1,0,1,0
 			db 0,1,0,1,0,1,0,1
 			db 1,0,1,0,1,0,1,0
@@ -61,7 +71,7 @@ sdatos segment
 			db 2,0,2,0,2,0,2,0
 			db 0,2,0,2,0,2,0,2 ,"$"
 
-
+	readTeclado db 50 dup("$"), "$"
 sdatos ends
 
 
@@ -116,35 +126,8 @@ scodigo segment 'CODE'
 
 			playgame:
 			
-				;mostrando info jugadores
-			
-				imprimir namesJ
-				imprimir shownameJ1
-				imprimir nameJ1
-				imprimir salto
-				imprimir fichaInfo1
-				imprimir espacio 
-				imprimir puntosJ1 ;PENDIENTE
-				imprimir puntos
-
-				imprimir salto
-				imprimir shownameJ2
-				imprimir nameJ2
-				imprimir salto
-				imprimir fichaInfo2
-				imprimir espacio 
-				imprimir puntosJ2 ;PENDIENTE 
-				imprimir puntos
-
 				
 
-			
-			
-				
-				imprimir salto
-				imprimir salto
-				showTablero
-				readjugador pauseEnter
 				limpiarT
 				
 
@@ -154,14 +137,102 @@ scodigo segment 'CODE'
 			
 		
 		juegoDamas:
+			;showTablero ;mostrando tablero
+			MOSTRAR_TAB
+			imprimir salto
 			imprimir turnomsg 
 			imprimir nameJ1
 			imprimir salto 
 			imprimir entradamovi
 			imprimir salto
+			leerHastaEnter readTeclado
+			;como la entrada en completa -> C2:D5
+			;leo de una vez todo y lo envio a sus diferntes lecturas de fila y columna
 
-			jmp opcion3
+			;imprimir readTeclado[2]
+			filaTablero 1d
+			columnaTablero 0d
+			posFicha fila, columna 
+			; posicion inicial de ficha
+			mov di, indice
+			;mov al, " "
+			;cmp tablero[di], 1d
+			;jnz posvacia
+			mov tablero[di], 0d ;vaciando celda
 
+			;colocando ficha en posicion nueva
+			mov fila, 0d
+			mov columna, 0d
+			mov indice, 0d
+
+			filaTablero 4d
+			columnaTablero 3d
+			posFicha fila, columna
+			mov di, indice
+			mov tablero[di], 1d
+
+			;aqui deben ir validaciones 
+
+
+			limpiarT
+			jmp nexTurn
+
+		nexTurn: ;Turno del jugador 2
+			;mostrando nuevo tablero
+			;showTablero
+			MOSTRAR_TAB
+			imprimir salto
+			imprimir turnomsg 
+			imprimir nameJ2
+			imprimir salto
+			imprimir entradamovi
+			imprimir salto
+			leerHastaEnter readTeclado
+
+			;entrada de jugador 2 
+			;su num es el "2" / las fichas de abajo
+			
+			;ficha a mover
+			mov fila, 0d
+			mov columna, 0d
+			mov indice, 0d
+			filaTablero 1d
+			columnaTablero 0d
+			posFicha fila, columna 
+			; posicion inicial de ficha
+			mov di, indice
+			;mov al, " "
+			;cmp tablero[di], 1d
+			;jnz posvacia
+			mov tablero[di], 0d ;vaciando celda
+			;colocando ficha en posicion nueva
+			mov fila, 0d
+			mov columna, 0d
+			mov indice, 0d
+
+			filaTablero 4d
+			columnaTablero 3d
+			posFicha fila, columna
+			mov di, indice
+			mov tablero[di], 2d
+
+			;aqui deben ir validaciones 
+			
+
+			limpiarT
+
+			;salto a esta parte porque quiero mostrar el tablero
+			;con los nombres y punteos actuales
+			jmp juegoDamas 
+
+
+
+		posvacia:
+			imprimir salto
+			imprimir noficha
+			imprimir salto
+			imprimir salto
+			jmp juegoDamas
 		opcion2:
 			imprimir salto
 			imprimir msgo2
