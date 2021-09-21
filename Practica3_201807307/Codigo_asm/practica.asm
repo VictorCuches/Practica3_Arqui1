@@ -35,8 +35,8 @@ sdatos segment
 	wordrep db "REP","$"
 	bool_rep db 0d
 
-	puntosJ1 db "1","$" ; deben ser tipo number
-	puntosJ2 db  "2","$"
+	puntosJ1 dw 0d; deben ser tipo number
+	puntosJ2 dw  0d
 	;puntoTemp db 10 dup("$")
 
 	nameJ1 db 50 dup("$")
@@ -96,7 +96,44 @@ sdatos ends
 scodigo segment 'CODE'
     
 	ASSUME SS:spila, DS:sdatos, CS:scodigo         
-	
+	IMPRIMIR_NUMERO proc
+		; AX -> parametro donde voy a poner el número a imprimir
+		push dx
+		push si
+		push di
+		push cx
+		push bx
+
+		mov cx, '$'
+		push cx
+		for1num:
+			xor dx, dx
+			mov bx, 10d
+			div bx
+			push dx
+			cmp ax, 10
+			jge for1num		
+			cmp ax, 0
+			je axEs0
+		push ax
+
+		axEs0:
+		for2num:
+			pop dx
+			cmp dl, '$'
+			je finFor2
+			mov ah, 02h
+			add dl, 30h
+			int 21h
+			jmp for2num
+		finFor2:
+		pop bx
+		pop cx
+		pop di
+		pop si
+		pop dx
+		ret
+	IMPRIMIR_NUMERO endp 
 	
 	main proc far 
 	    
@@ -284,6 +321,10 @@ scodigo segment 'CODE'
 			;lectura del nameJ1 caracter por caracter 
 			wnameFile nameJ1
 			writeFile handle, 1, lineas[1]
+
+			writeFile handle, 1, espacio[0]
+			add puntosJ1, 30h
+			writeFile handle, 1, puntosJ1
 			writeFile handle, 7, puntos
 
 			writeFile handle, 4, saltoh
@@ -291,6 +332,10 @@ scodigo segment 'CODE'
 			;lectura del nameJ2 caracter por caracter 
 			wnameFile nameJ2
 			writeFile handle, 1, lineas[1]
+			writeFile handle, 1, espacio[0]
+			add puntosJ2, 30h
+			writeFile handle, 1, puntosJ2
+
 			writeFile handle, 7, puntos
 
 			writeFile handle, 4, saltoh

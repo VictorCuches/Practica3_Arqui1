@@ -233,9 +233,10 @@ MOSTRAR_TAB macro
 	imprimir salto
 	imprimir fichaInfo1
 	imprimir espacio 
-    
-	imprimir puntosJ1
+    mov ax, puntosJ1
+	call IMPRIMIR_NUMERO 
 	imprimir puntos
+    xor ax, ax
 
 	imprimir salto
 	imprimir shownameJ2
@@ -243,8 +244,11 @@ MOSTRAR_TAB macro
 	imprimir salto
 	imprimir fichaInfo2
 	imprimir espacio 
-	imprimir puntosJ2
+	
+    mov ax, puntosJ2
+    call IMPRIMIR_NUMERO
 	imprimir puntos
+    xor ax, ax
 
 	imprimir salto
 	imprimir salto
