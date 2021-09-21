@@ -226,13 +226,15 @@ columnaTablero macro  numCpos
 endm
 
 MOSTRAR_TAB macro
+    
 	imprimir namesJ
 	imprimir shownameJ1
 	imprimir nameJ1
 	imprimir salto
 	imprimir fichaInfo1
 	imprimir espacio 
-	imprimir puntosJ1 ;PENDIENTE
+    
+	imprimir puntosJ1
 	imprimir puntos
 
 	imprimir salto
@@ -241,7 +243,7 @@ MOSTRAR_TAB macro
 	imprimir salto
 	imprimir fichaInfo2
 	imprimir espacio 
-	imprimir puntosJ2 ;PENDIENTE 
+	imprimir puntosJ2
 	imprimir puntos
 
 	imprimir salto
@@ -294,5 +296,202 @@ limpiarEntrada macro entradaT
         inc si
         jmp ciclo
     fin:
+
+endm
+
+
+openFile macro rutaFile
+    mov ah, 3Dh
+    mov al, 2
+    mov dx, offset rutaFile
+    int 21h
+
+    mov handle, ax ;manipula archivo
+    
+endm
+
+closeFile macro idFile
+    mov ah, 3Eh
+    mov bx, idFile
+    int 21h
+endm
+
+writeFile macro idFile, numBytes, datos
+    mov ah, 40h
+    mov bx, idFile
+    mov cx, numBytes
+    lea dx, datos ; lo mismo que offset
+    int 21h
+endm
+
+
+tableroFile macro
+    local ciclo, ciclo2, ciclo3, ciclo4, reinicio, reinicio2
+    
+    xor si, si ; limpiando si
+
+    writeFile handle, 4, atr ;abriendo fila de letras ABC...
+    writeFile handle, 4, atd ;abriendo columna para cada letra
+    writeFile handle, 1, espacio[0] ;colocando en la celda la letra
+    writeFile handle, 5, ctd
+    ciclo: 
+        mov bl, cabecerasC[si] ;ABCDE...
+        mov individual[0], bl
+
+        writeFile handle, 4, atd ;abriendo columna para cada letra
+        writeFile handle, 1, individual[0] ;colocando en la celda la letra
+        writeFile handle, 5, ctd ;cerrando columna para cada letra
+
+        inc si 
+        cmp si, 8d ; numero de columnas 
+        jnz ciclo
+    
+    writeFile handle, 5, ctr ;cerrando fila de letras ABC...
+    
+    xor si, si
+    mov iteradorJ, 0d
+
+    writeFile handle, 4, atr
+    ciclo2:
+        mov bl, cabecerasF[si]
+        mov individual[0], bl
+        writeFile handle, 4, atd ;
+        writeFile handle, 1, individual[0] 
+        ;colocando en la celda el numero 123...
+        writeFile handle, 5, ctd 
+
+        mov iteradorI, 0d
+
+        ciclo3: 
+            mov di, iteradorJ
+            verificarFile tablero[di]
+           
+            inc iteradorJ
+            ;imprimir individual
+            
+
+            inc iteradorI
+            cmp iteradorI, 8d
+            jz reinicio
+
+           
+            
+            jmp ciclo3
+
+        reinicio: 
+            writeFile handle, 5, ctr ;aqui se empieza otra linea 
+            ; por eso cierro el tr
+            
+            
+            cmp si, 7d
+            jz reinicio2
+            mov iteradorI, 0d
+            
+
+            ciclo4:
+                mov bl, lineas[1]
+                mov individual[0], bl
+                ;imprimir individual
+                inc iteradorI
+                cmp iteradorI, 32d
+                jnz ciclo4
+            
+        reinicio2:
+            ;imprimir salto
+            inc si
+            cmp si, 8d
+            jnz ciclo2
+
+endm
+
+verificarFile macro valor
+    local cero, uno, dos, fin
+
+    cmp valor, 0d
+    jz cero
+
+    cmp valor, 1d
+    jz uno
+
+    dos: 
+        
+        writeFile handle, 4, atd 
+        writeFile handle, 1, celdaJ2
+        ;0 ficha de jugador2
+        writeFile handle, 5, ctd 
+        jmp fin
+
+    uno: 
+        writeFile handle, 4, atd 
+        writeFile handle, 1, celdaJ1 
+        ;x ficha de jugador1
+        writeFile handle, 5, ctd 
+        jmp fin
+
+    cero: 
+     
+        mov individual[0], " "
+        writeFile handle, 4, atd ;
+        writeFile handle, 1, individual[0] 
+        ;colocando en la celda el numero 123...
+        writeFile handle, 5, ctd 
+        jmp fin
+
+    fin:
+
+endm
+
+; imprimirnum macro
+;     push dx
+;     mov cx, "$"
+;     push cx
+;     forInum: 
+;         xor dx, dx
+;         mov bx, 10d
+;         div bx
+;         push dx
+;         cmp ax, 10
+;         jge forInum
+
+;     push ax
+    
+;     fordnum:
+;         pop dx
+;         cmp dl, "$"
+;         je finford
+;         mov ah, 02h
+;         add dl, 30h
+;         int 21h
+        
+;         jmp fordnum
+
+;     finford:
+
+
+
+;     pop dx
+     
+;     ret
+
+; endm
+
+wnameFile macro nombrep
+    local ciclo, final
+
+    xor di, di
+
+    ciclo: 
+        mov bl, nombrep[di]
+
+        cmp bl, "$"
+        jz final
+
+        writeFile handle, 1, nombrep[di]
+        inc di
+        
+        jmp ciclo
+
+    final:
+
 
 endm

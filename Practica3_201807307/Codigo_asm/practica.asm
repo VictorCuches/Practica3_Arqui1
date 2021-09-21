@@ -35,14 +35,15 @@ sdatos segment
 	wordrep db "REP","$"
 	bool_rep db 0d
 
-	puntosJ1 db "1$" ; deben ser tipo number
-	puntosJ2 db "2$"
+	puntosJ1 db "1","$" ; deben ser tipo number
+	puntosJ2 db  "2","$"
+	;puntoTemp db 10 dup("$")
 
 	nameJ1 db 50 dup("$")
 	nameJ2 db 50 dup("$")
 	bool_name db 0d
 
-	tituloTab db "----- TABLERO DE JUEGO -----","$"
+	tituloTab db "-- TABLERO DE JUEGO --","$"
 	moverror db "Movimiento incorrecto ",0DH, 0AH,"$"
 	noficha db "Error. No se encuentra ficha a mover","$"
 	cabecerasC db "ABCDEFGH$"
@@ -76,6 +77,19 @@ sdatos segment
 			db 0,2,0,2,0,2,0,2 ,"$"
 
 	readTeclado db 50 dup("$")
+
+	ruta db "reporte.htm",0
+	handle dw 0
+	atab db "<table border=1>"
+	ctab db "</table>"
+	atr db "<tr>"
+	ctr db "</tr>"
+	atd db "<td>"
+	ctd db "</td>"
+	saltoh db "<br>"
+	
+	celdaJ1 db "x"
+	celdaJ2 db "o"
 sdatos ends
 
 
@@ -259,6 +273,62 @@ scodigo segment 'CODE'
 			imprimir salto
 			imprimir msgrep
 			imprimir salto
+
+			openFile ruta
+
+			writeFile handle, 16, atab ;apertura table
+			
+			writeFile handle, 7, msgrep
+			writeFile handle, 4, saltoh
+			writeFile handle, 11, shownameJ1
+			;lectura del nameJ1 caracter por caracter 
+			wnameFile nameJ1
+			writeFile handle, 1, lineas[1]
+			writeFile handle, 7, puntos
+
+			writeFile handle, 4, saltoh
+			writeFile handle, 11, shownameJ2
+			;lectura del nameJ2 caracter por caracter 
+			wnameFile nameJ2
+			writeFile handle, 1, lineas[1]
+			writeFile handle, 7, puntos
+
+			writeFile handle, 4, saltoh
+			writeFile handle, 4, saltoh
+			writeFile handle, 22, tituloTab
+			writeFile handle, 4, saltoh
+			tableroFile
+			; atr y ctr para filas
+			; atd y ctd para columnas
+
+			; writeFile handle, 4, atr
+			; writeFile handle, 4, atd
+			; writeFile handle, 1, celdaJ1
+			; writeFile handle, 5, ctd
+			; writeFile handle, 4, atd
+			; writeFile handle, 1, celdaJ1
+			; writeFile handle, 5, ctd
+			; writeFile handle, 4, atd
+			; writeFile handle, 1, celdaJ2
+			; writeFile handle, 5, ctd
+			; writeFile handle, 5, ctr
+
+			; writeFile handle, 4, atr
+			; writeFile handle, 4, atd
+			; writeFile handle, 1, celdaJ1
+			; writeFile handle, 5, ctd
+			; writeFile handle, 4, atd
+			; writeFile handle, 1, celdaJ2
+			; writeFile handle, 5, ctd
+			; writeFile handle, 5, ctr
+
+			writeFile handle, 8, ctab ;cerrando table
+		
+
+			
+
+			closeFile handle
+
 			jmp opcion3
 
 		posvacia:
