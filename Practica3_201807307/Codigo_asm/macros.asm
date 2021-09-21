@@ -250,3 +250,49 @@ MOSTRAR_TAB macro
 
 	 
 endm
+
+verificarREP macro  
+    local comparar, diferente, iguales, final
+    xor di, di
+    xor bh, bh
+    xor bl, bl
+    
+    comparar:
+        mov bh, readTeclado[di]
+        mov bl, wordrep[di]
+        cmp bh, bl
+        ; sino son iguales
+        jnz diferente
+
+        cmp bl, "$" ;si es igual a dolar
+        jz iguales
+        ; si son iguales
+        inc di
+        jmp comparar
+
+    iguales:
+        ;imprimir igualesW
+        mov bool_rep, 1d
+        jmp final
+    diferente: 
+        ;imprimir diferentesW
+        mov bool_rep, 0d
+        jmp final
+    final:  
+endm
+
+limpiarEntrada macro entradaT
+    local ciclo, ciclo2, fin
+    xor si, si
+    ciclo:
+        mov bl, "$"
+        mov entradaT[si], bl
+        
+
+        cmp si, 49d
+        je fin
+        inc si
+        jmp ciclo
+    fin:
+
+endm

@@ -31,12 +31,16 @@ sdatos segment
 	turnomsg db "Turno de: ","$"
 	entradamovi db "Ingrese movimiento de fichas: ","$"
 
+	msgrep db "REPORTE","$"
+	wordrep db "REP","$"
+	bool_rep db 0d
+
 	puntosJ1 db "1$" ; deben ser tipo number
 	puntosJ2 db "2$"
 
 	nameJ1 db 50 dup("$")
 	nameJ2 db 50 dup("$")
-	bool_name db 0
+	bool_name db 0d
 
 	tituloTab db "----- TABLERO DE JUEGO -----","$"
 	moverror db "Movimiento incorrecto ",0DH, 0AH,"$"
@@ -71,7 +75,7 @@ sdatos segment
 			db 2,0,2,0,2,0,2,0
 			db 0,2,0,2,0,2,0,2 ,"$"
 
-	readTeclado db 50 dup("$"), "$"
+	readTeclado db 50 dup("$")
 sdatos ends
 
 
@@ -138,6 +142,10 @@ scodigo segment 'CODE'
 		
 		juegoDamas:
 			;showTablero ;mostrando tablero
+			;xor readTeclado, readTeclado
+			limpiarEntrada readTeclado 
+			;limpio la entrada para no afectar lo demas
+			;y llenarla desde cero
 			MOSTRAR_TAB
 			imprimir salto
 			imprimir turnomsg 
@@ -148,6 +156,15 @@ scodigo segment 'CODE'
 			leerHastaEnter readTeclado
 			;como la entrada en completa -> C2:D5
 			;leo de una vez todo y lo envio a sus diferntes lecturas de fila y columna
+
+			;aqui tambien verifico si ingresa REP
+			;en readTeclado esta la entrada REP
+		
+			verificarREP  
+			cmp bool_rep, 1d
+			je generateReporte
+
+		
 
 			;imprimir readTeclado[2]
 			filaTablero 1d
@@ -175,11 +192,16 @@ scodigo segment 'CODE'
 
 
 			limpiarT
+			  
 			jmp nexTurn
 
 		nexTurn: ;Turno del jugador 2
+			;xor readTeclado, readTeclado
 			;mostrando nuevo tablero
 			;showTablero
+			limpiarEntrada readTeclado
+			;limpio la entrada para no afectar lo demas
+			;y llenarla desde cero
 			MOSTRAR_TAB
 			imprimir salto
 			imprimir turnomsg 
@@ -188,6 +210,11 @@ scodigo segment 'CODE'
 			imprimir entradamovi
 			imprimir salto
 			leerHastaEnter readTeclado
+
+			;validar si se ingresa REP
+			verificarREP  
+			cmp bool_rep, 1d
+			je generateReporte
 
 			;entrada de jugador 2 
 			;su num es el "2" / las fichas de abajo
@@ -217,17 +244,25 @@ scodigo segment 'CODE'
 			mov tablero[di], 2d
 
 			;aqui deben ir validaciones 
-			
+
 
 			limpiarT
+			 
 
 			;salto a esta parte porque quiero mostrar el tablero
 			;con los nombres y punteos actuales
 			jmp juegoDamas 
 
 
+		generateReporte:
+			limpiarT
+			imprimir salto
+			imprimir msgrep
+			imprimir salto
+			jmp opcion3
 
 		posvacia:
+			 
 			imprimir salto
 			imprimir noficha
 			imprimir salto
