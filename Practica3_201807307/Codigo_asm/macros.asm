@@ -248,7 +248,7 @@ MOSTRAR_TAB macro
     mov ax, puntosJ2
     call IMPRIMIR_NUMERO
 	imprimir puntos
-    xor ax, ax
+    xor ax, ax ;f
 
 	imprimir salto
 	imprimir salto

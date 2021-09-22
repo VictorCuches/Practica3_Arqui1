@@ -45,6 +45,7 @@ sdatos segment
 
 	tituloTab db "-- TABLERO DE JUEGO --","$"
 	moverror db "Movimiento incorrecto ",0DH, 0AH,"$"
+	repeatmov db "Repita el movimiento...",0DH, 0AH,"$"
 	noficha db "Error. No se encuentra ficha a mover","$"
 	cabecerasC db "ABCDEFGH$"
 	cabecerasF db "12345678$"
@@ -53,6 +54,12 @@ sdatos segment
 	espacio db " $"
 	linver db "|$"
 	color db 0
+
+	comeria db "izquierda-abajo","$"
+	comerda db "derecha-abajo","$"
+
+	comeriaa db "izquierda-arriba","$"
+	comerdaa db "derecha-arriba","$"
 
 	iteradorI dw 0
 	iteradorJ dw 0
@@ -64,6 +71,7 @@ sdatos segment
 	newC db 4d
 
 	indice dw 0
+	oldIndice dw 0
 	fila dw 0
 	columna dw 0
 
@@ -192,6 +200,8 @@ scodigo segment 'CODE'
 			
 		
 		juegoDamas:
+			mov oldIndice, 0d
+			mov indice, 0d
 			;showTablero ;mostrando tablero
 			;xor readTeclado, readTeclado
 			limpiarEntrada readTeclado 
@@ -223,10 +233,13 @@ scodigo segment 'CODE'
 			posFicha fila, columna 
 			; posicion inicial de ficha
 			mov di, indice
+			;mov bx, indice
+			mov oldIndice, di ;guardadndo el indice inicial 
 			;mov al, " "
 			;cmp tablero[di], 1d
 			;jnz posvacia
 			mov tablero[di], 0d ;vaciando celda
+
 
 			;colocando ficha en posicion nueva
 			mov fila, 0d
@@ -241,12 +254,77 @@ scodigo segment 'CODE'
 
 			;aqui deben ir validaciones 
 
+			mov ax, indice
+			sub ax, oldIndice
 
-			limpiarT
-			  
+			cmp ax, 14d
+			je comeruno ;diagonal izquierda-abajo
+
+			mov ax, indice
+			sub ax, oldIndice
+			cmp ax, 18d
+			je comerdos ;diagonal derecha-abajo
+
+		
 			jmp nexTurn
+		
+		comeruno:
+			xor ax, ax
+			xor si, si
+			; imprimir salto
+			; imprimir comeria
+			; imprimir salto
+
+			mov ax, oldIndice
+			add ax, 7d
+			mov si, ax
+			cmp tablero[si], 2d
+			je eliminarficha
+			
+			jmp moverrorjuno
+			eliminarficha:
+				mov tablero[si], 0d
+				inc puntosJ1
+				jmp nexTurn
+				
+			;jmp opcion3
+			
+		comerdos: 
+
+			xor ax, ax
+			xor si, si
+			
+			mov ax, oldIndice
+			add ax, 9d
+			mov si, ax
+			cmp tablero[si], 2d
+			je eliminarficha2
+			
+			jmp moverrorjuno
+			eliminarficha2:
+				mov tablero[si], 0d
+				inc puntosJ1
+				jmp nexTurn
+			;jmp nexTurn
+
+		moverrorjuno:
+			xor si, si
+			xor di, di
+			mov si, oldIndice
+			mov tablero[si], 1d
+			mov di, indice
+			mov tablero[di], 0d
+
+			imprimir moverror
+			imprimir repeatmov
+			leerHastaEnter pauseEnter
+
+			
+			jmp juegoDamas
 
 		nexTurn: ;Turno del jugador 2
+			mov oldIndice, 0d
+			mov indice, 0d
 			;xor readTeclado, readTeclado
 			;mostrando nuevo tablero
 			;showTablero
@@ -279,6 +357,7 @@ scodigo segment 'CODE'
 			posFicha fila, columna 
 			; posicion inicial de ficha
 			mov di, indice
+			mov oldIndice, di ;guardadndo el indice inicial 
 			;mov al, " "
 			;cmp tablero[di], 1d
 			;jnz posvacia
@@ -295,15 +374,70 @@ scodigo segment 'CODE'
 			mov tablero[di], 2d
 
 			;aqui deben ir validaciones 
+			mov ax, oldIndice
+			sub ax, indice
+
+			cmp ax, 18d
+
+			je comerunod ;diagonal izquierda-arriba
+
+			mov ax, oldIndice
+			sub ax, indice
+			cmp ax, 14d
+			je comerdosd ;diagonal derecha-arriba
 
 
-			limpiarT
+			;limpiarT
 			 
 
 			;salto a esta parte porque quiero mostrar el tablero
 			;con los nombres y punteos actuales
 			jmp juegoDamas 
 
+		comerunod: ; izquierda-arriba
+			xor ax, ax
+			xor si, si
+			mov ax, oldIndice
+			sub ax, 9d
+			mov si, ax
+
+			cmp tablero[si], 1d
+			je eliminarfichau
+			jmp moverrorjdos
+			eliminarfichau: 
+				mov tablero[si],0d
+				inc puntosJ2
+				jmp juegoDamas
+			
+		comerdosd: ;derecha-arriba
+			xor ax, ax
+			xor si, si
+			mov ax, oldIndice
+			sub ax, 7d
+			mov si, ax
+
+			cmp tablero[si], 1d
+			je eliminarfichaud
+			jmp moverrorjdos
+			eliminarfichaud: 
+				mov tablero[si], 0d
+				inc puntosJ2
+				jmp juegoDamas
+
+		moverrorjdos:
+			xor si, si
+			xor di, di
+			mov si, oldIndice
+			mov tablero[si], 2d
+			mov di, indice
+			mov tablero[di], 0d
+
+			imprimir moverror
+			imprimir repeatmov
+			leerHastaEnter pauseEnter
+
+			
+			jmp nexTurn
 
 		generateReporte:
 			limpiarT
