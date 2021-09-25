@@ -54,6 +54,7 @@ sdatos segment
 	espacio db " $"
 	linver db "|$"
 	color db 0
+	bool_error db 0
 
 	comeria db "izquierda-abajo","$"
 	comerda db "derecha-abajo","$"
@@ -98,6 +99,8 @@ sdatos segment
 	
 	celdaJ1 db "x"
 	celdaJ2 db "o"
+	celdaJ1R db "X"
+	celdaJ2R db "O"
 sdatos ends
 
 
@@ -229,7 +232,13 @@ scodigo segment 'CODE'
 
 			;imprimir readTeclado[2]
 			filaTablero 1d
+			; cmp bool_error, 1d
+			; je juegoDamas
+			
 			columnaTablero 0d
+			; cmp bool_error, 1d
+			; je juegoDamas
+
 			posFicha fila, columna 
 			; posicion inicial de ficha
 			mov di, indice
@@ -238,7 +247,7 @@ scodigo segment 'CODE'
 			;mov al, " "
 			;cmp tablero[di], 1d
 			;jnz posvacia
-			mov tablero[di], 0d ;vaciando celda
+			mov tablero[di], 0d ;vaciando celda --------------------------------------
 
 
 			;colocando ficha en posicion nueva
@@ -250,10 +259,11 @@ scodigo segment 'CODE'
 			columnaTablero 3d
 			posFicha fila, columna
 			mov di, indice
-			mov tablero[di], 1d
+			mov tablero[di], 1d ; llenando la celda ----------------------------------------
 
 			;aqui deben ir validaciones 
 
+			;validacion para comer ficha del rival
 			mov ax, indice
 			sub ax, oldIndice
 
@@ -265,9 +275,41 @@ scodigo segment 'CODE'
 			cmp ax, 18d
 			je comerdos ;diagonal derecha-abajo
 
+			
+			;validacion para no moverse al frente
+			xor ax, ax
+			mov ax, oldIndice
+			add ax, 8d
+			cmp indice, ax
+			je moverrorjuno
+
+			; sin restriccion de movimiento para reinas
+			; xor si, si
+			; mov si, oldIndice			 
+			; cmp tablero[si], 3d
+			; je nexTurn
+			
+
+			;validacion para no moverse hacia atras
+			mov ax, indice
+			cmp ax, oldIndice
+			jb moverrorjuno
+
+			;validacion para coronarse
+			xor ax, ax
+			mov ax, indice
+			cmp indice, 56d
+			jae coronarJ1
+
+			
 		
 			jmp nexTurn
 		
+		coronarJ1: 
+			xor di, di
+		 	mov di, indice
+			mov tablero[di], 3d
+			jmp nexTurn
 		comeruno:
 			xor ax, ax
 			xor si, si
@@ -374,6 +416,7 @@ scodigo segment 'CODE'
 			mov tablero[di], 2d
 
 			;aqui deben ir validaciones 
+			;validacion para comer ficha del rival
 			mov ax, oldIndice
 			sub ax, indice
 
@@ -386,14 +429,40 @@ scodigo segment 'CODE'
 			cmp ax, 14d
 			je comerdosd ;diagonal derecha-arriba
 
+			;validacion para no mover al frente
+			xor ax, ax
+			mov ax, oldIndice
+			sub ax, 8d
 
-			;limpiarT
+			cmp indice, ax
+			je moverrorjdos
+
+			;sin restriccion de movimiento diagonal para reinas
+			; mov di, oldIndice
+			; mov al, tablero[di]
+			; cmp al, 4d
+			; je juegoDamas
+
+			;validacion para no moverse hacia atras
+			mov ax, indice
+			cmp ax, oldIndice
+			ja moverrorjdos
+
+			;validacion para coronarse
+			xor ax, ax
+			mov ax, indice
+			cmp indice, 7d
+			jbe coronarJ2
 			 
 
 			;salto a esta parte porque quiero mostrar el tablero
 			;con los nombres y punteos actuales
 			jmp juegoDamas 
 
+		coronarJ2:
+			mov di, indice
+			mov tablero[di], 4d
+			jmp juegoDamas
 		comerunod: ; izquierda-arriba
 			xor ax, ax
 			xor si, si

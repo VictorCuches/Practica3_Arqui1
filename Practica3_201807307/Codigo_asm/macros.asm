@@ -128,13 +128,21 @@ showTablero macro
 endm
 
 verificarValor macro valor
-    local cero, uno, dos, fin
+    local cero, uno, dos, tres, cuatro, fin
 
     cmp valor, 0d
     jz cero
 
     cmp valor, 1d
     jz uno
+
+    cmp valor, 3d
+    jz tres
+
+    cmp valor, 4d
+    jz cuatro
+
+    
 
     dos: 
         mov color, 04d
@@ -151,6 +159,15 @@ verificarValor macro valor
         mov individual[0], " "
         jmp fin
 
+    tres:
+        mov color, 11d
+        mov individual[0], 03
+        jmp fin
+
+    cuatro: 
+        mov color, 04d
+        mov individual[0], 06
+        jmp fin
     fin:
 
 endm
@@ -195,10 +212,13 @@ filaTablero macro numFpos
     imprimir salto
     imprimir moverror
     imprimir salto
-    jmp inicio
+    ;mov bool_error, 1d
+     
+  
 
     saveFpos:
         mov fila, di ;numero de fila 
+       
 endm
 
 columnaTablero macro  numCpos
@@ -218,10 +238,15 @@ columnaTablero macro  numCpos
     imprimir salto
     imprimir moverror
     imprimir salto
-    jmp inicio
+    ;mov bool_error, 1d
+  
 
     saveCpos:
         mov columna, di
+       
+
+   
+
 
 endm
 
@@ -409,13 +434,19 @@ tableroFile macro
 endm
 
 verificarFile macro valor
-    local cero, uno, dos, fin
+    local cero, uno, dos, tres, cuatro,  fin
 
     cmp valor, 0d
     jz cero
 
     cmp valor, 1d
     jz uno
+
+    cmp valor, 3d
+    jz tres
+
+    cmp valor, 4d
+    jz cuatro
 
     dos: 
         
@@ -428,6 +459,21 @@ verificarFile macro valor
     uno: 
         writeFile handle, 4, atd 
         writeFile handle, 1, celdaJ1 
+        ;x ficha de jugador1
+        writeFile handle, 5, ctd 
+        jmp fin
+
+    cuatro: 
+        
+        writeFile handle, 4, atd 
+        writeFile handle, 1, celdaJ2R
+        ;0 ficha de jugador2
+        writeFile handle, 5, ctd 
+        jmp fin
+
+    tres: 
+        writeFile handle, 4, atd 
+        writeFile handle, 1, celdaJ1R 
         ;x ficha de jugador1
         writeFile handle, 5, ctd 
         jmp fin
