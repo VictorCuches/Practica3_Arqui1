@@ -466,14 +466,14 @@ verificarFile macro valor
     cuatro: 
         
         writeFile handle, 4, atd 
-        writeFile handle, 1, celdaJ2R
+        writeFile handle, 2, celdaJ2R
         ;0 ficha de jugador2
         writeFile handle, 5, ctd 
         jmp fin
 
     tres: 
         writeFile handle, 4, atd 
-        writeFile handle, 1, celdaJ1R 
+        writeFile handle, 2, celdaJ1R 
         ;x ficha de jugador1
         writeFile handle, 5, ctd 
         jmp fin

@@ -20,6 +20,7 @@ sdatos segment
 	msgu2 db "Ingrese nombre de jugador 2: ", "$"
 	namesJ db "----- Jugadores -----", 0DH, 0AH, "$"
 	errorJ db "Error. Se debe crear jugadores primero ", "$"
+	msg_noficha db "Seleccione la ficha correcta ", "$"
 	pauseEnter db 50 dup("$"), "$"
 
 	shownameJ1 db "Jugador 1: ", "$"
@@ -99,8 +100,8 @@ sdatos segment
 	
 	celdaJ1 db "x"
 	celdaJ2 db "o"
-	celdaJ1R db "X"
-	celdaJ2R db "O"
+	celdaJ1R db "X'"
+	celdaJ2R db "O'"
 sdatos ends
 
 
@@ -247,63 +248,100 @@ scodigo segment 'CODE'
 			;mov al, " "
 			;cmp tablero[di], 1d
 			;jnz posvacia
-			mov tablero[di], 0d ;vaciando celda --------------------------------------
-
-
-			;colocando ficha en posicion nueva
-			mov fila, 0d
-			mov columna, 0d
-			mov indice, 0d
-
-			filaTablero 4d
-			columnaTablero 3d
-			posFicha fila, columna
-			mov di, indice
-			mov tablero[di], 1d ; llenando la celda ----------------------------------------
-
-			;aqui deben ir validaciones 
-
-			;validacion para comer ficha del rival
-			mov ax, indice
-			sub ax, oldIndice
-
-			cmp ax, 14d
-			je comeruno ;diagonal izquierda-abajo
-
-			mov ax, indice
-			sub ax, oldIndice
-			cmp ax, 18d
-			je comerdos ;diagonal derecha-abajo
-
 			
-			;validacion para no moverse al frente
-			xor ax, ax
-			mov ax, oldIndice
-			add ax, 8d
-			cmp indice, ax
-			je moverrorjuno
-
-			; sin restriccion de movimiento para reinas
-			; xor si, si
-			; mov si, oldIndice			 
-			; cmp tablero[si], 3d
-			; je nexTurn
 			
+			;validacion para no poder seleccionar las fichas del oponente
+			cmp tablero[di], 2d
+			je nofichaju
+			cmp tablero[di], 0d
+			je nofichaju
+			; cmp tablero[si], 1d
+			jmp continuarturnou
+			nofichaju: ;mensaje de error e intenta ingresar movimiento
+				imprimir salto
+				imprimir msg_noficha
+				imprimir salto
+				leerHastaEnter pauseEnter
+				jmp juegoDamas
 
-			;validacion para no moverse hacia atras
-			mov ax, indice
-			cmp ax, oldIndice
-			jb moverrorjuno
+			continuarturnou:
 
-			;validacion para coronarse
-			xor ax, ax
-			mov ax, indice
-			cmp indice, 56d
-			jae coronarJ1
 
-			
-		
-			jmp nexTurn
+				; sin restriccion de movimiento para reinas
+				xor si, si
+				mov si, oldIndice			 
+				cmp tablero[si], 3d
+				je movreinau
+				jmp noreinau
+
+				movreinau: 
+					mov tablero[di], 0d
+					mov fila, 0d
+					mov columna, 0d
+					mov indice, 0d
+
+					filaTablero 4d
+					columnaTablero 3d
+					posFicha fila, columna
+					mov di, indice
+					mov tablero[di], 3d
+					;aqui irian las validaciones para comer fichas del rival
+					jmp nexTurn
+
+				noreinau:
+					mov tablero[di], 0d ;vaciando celda --------------------------------------
+
+					
+					;colocando ficha en posicion nueva
+					mov fila, 0d
+					mov columna, 0d
+					mov indice, 0d
+
+					filaTablero 4d
+					columnaTablero 3d
+					posFicha fila, columna
+					mov di, indice
+					mov tablero[di], 1d ; llenando la celda ----------------------------------------
+
+					;aqui deben ir validaciones 
+
+					;validacion para comer ficha del rival
+					mov ax, indice
+					sub ax, oldIndice
+
+					cmp ax, 14d
+					je comeruno ;diagonal izquierda-abajo
+
+					mov ax, indice
+					sub ax, oldIndice
+					cmp ax, 18d
+					je comerdos ;diagonal derecha-abajo
+
+					
+					;validacion para no moverse al frente
+					xor ax, ax
+					mov ax, oldIndice
+					add ax, 8d
+					cmp indice, ax
+					je moverrorjuno
+
+					
+					
+
+					;validacion para no moverse hacia atras
+					mov ax, indice
+					cmp ax, oldIndice
+					jb moverrorjuno
+
+					;validacion para coronarse
+					xor ax, ax
+					mov ax, indice
+					cmp indice, 56d
+					jae coronarJ1
+
+					
+				
+					jmp nexTurn
 		
 		coronarJ1: 
 			xor di, di
@@ -403,61 +441,100 @@ scodigo segment 'CODE'
 			;mov al, " "
 			;cmp tablero[di], 1d
 			;jnz posvacia
-			mov tablero[di], 0d ;vaciando celda
-			;colocando ficha en posicion nueva
-			mov fila, 0d
-			mov columna, 0d
-			mov indice, 0d
 
-			filaTablero 4d
-			columnaTablero 3d
-			posFicha fila, columna
-			mov di, indice
-			mov tablero[di], 2d
+			;validar que no mueva fichas del rival
+		
+			cmp tablero[di], 1d
+			je nofichajd
+			cmp tablero[di], 0d
+			je nofichajd
+			
+			jmp continuarturnod
+			nofichajd: ;mensaje de error e intenta ingresar movimiento
+				imprimir salto
+				imprimir msg_noficha
+				imprimir salto
+				leerHastaEnter pauseEnter
+				jmp juegoDamas
 
-			;aqui deben ir validaciones 
-			;validacion para comer ficha del rival
-			mov ax, oldIndice
-			sub ax, indice
+			continuarturnod:
+				; sin restriccion de movimiento para reinas
+				xor si, si
+				mov si, oldIndice			 
+				cmp tablero[si], 4d
+				je movreinad
+				jmp noreinad
+				movreinad: 
+					mov tablero[di], 0d
+					mov fila, 0d
+					mov columna, 0d
+					mov indice, 0d
 
-			cmp ax, 18d
+					filaTablero 4d
+					columnaTablero 3d
+					posFicha fila, columna
+					mov di, indice
+					mov tablero[di], 4d
+					;aqui irian las validaciones para comer fichas del rival
+					jmp juegoDamas
 
-			je comerunod ;diagonal izquierda-arriba
+				noreinad:
 
-			mov ax, oldIndice
-			sub ax, indice
-			cmp ax, 14d
-			je comerdosd ;diagonal derecha-arriba
+				mov tablero[di], 0d ;vaciando celda
+				;colocando ficha en posicion nueva
+				mov fila, 0d
+				mov columna, 0d
+				mov indice, 0d
 
-			;validacion para no mover al frente
-			xor ax, ax
-			mov ax, oldIndice
-			sub ax, 8d
+				filaTablero 4d
+				columnaTablero 3d
+				posFicha fila, columna
+				mov di, indice
+				mov tablero[di], 2d
 
-			cmp indice, ax
-			je moverrorjdos
+				;aqui deben ir validaciones 
+				;validacion para comer ficha del rival
+				mov ax, oldIndice
+				sub ax, indice
 
-			;sin restriccion de movimiento diagonal para reinas
-			; mov di, oldIndice
-			; mov al, tablero[di]
-			; cmp al, 4d
-			; je juegoDamas
+				cmp ax, 18d
 
-			;validacion para no moverse hacia atras
-			mov ax, indice
-			cmp ax, oldIndice
-			ja moverrorjdos
+				je comerunod ;diagonal izquierda-arriba
 
-			;validacion para coronarse
-			xor ax, ax
-			mov ax, indice
-			cmp indice, 7d
-			jbe coronarJ2
-			 
+				mov ax, oldIndice
+				sub ax, indice
+				cmp ax, 14d
+				je comerdosd ;diagonal derecha-arriba
 
-			;salto a esta parte porque quiero mostrar el tablero
-			;con los nombres y punteos actuales
-			jmp juegoDamas 
+				;validacion para no mover al frente
+				xor ax, ax
+				mov ax, oldIndice
+				sub ax, 8d
+
+				cmp indice, ax
+				je moverrorjdos
+
+				;sin restriccion de movimiento diagonal para reinas
+				; mov di, oldIndice
+				; mov al, tablero[di]
+				; cmp al, 4d
+				; je juegoDamas
+
+				;validacion para no moverse hacia atras
+				mov ax, indice
+				cmp ax, oldIndice
+				ja moverrorjdos
+
+				;validacion para coronarse
+				xor ax, ax
+				mov ax, indice
+				cmp indice, 7d
+				jbe coronarJ2
+				
+
+				;salto a esta parte porque quiero mostrar el tablero
+				;con los nombres y punteos actuales
+				jmp juegoDamas 
 
 		coronarJ2:
 			mov di, indice
